@@ -117,7 +117,148 @@ function updateGems() {
     if (dist < g.radius + player.width / 2) {
       g.collected = true;
     }
+  }const TILE_SIZE = 32;
+
+const MAZE = [
+  "####################",
+  "#........#.........#",
+  "#.####...#...####..#",
+  "#.#  #...#...#  #..#",
+  "#.#  #### ####  #..#",
+  "#.................E#",
+  "####################",
+];
+function drawMaze() {
+  for (let row = 0; row < MAZE.length; row++) {
+    for (let col = 0; col < MAZE[row].length; col++) {
+      const tile = MAZE[row][col];
+      const x = col * TILE_SIZE;
+      const y = row * TILE_SIZE;
+
+      if (tile === "#") {
+        ctx.fillStyle = "#1f2933"; // wall
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+      } else {
+        ctx.fillStyle = "#0b1120"; // floor
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+      }
+    }
   }
+}
+function createPlayer() {
+  player = {
+    col: 1,
+    row: 1,
+    x: 1 * TILE_SIZE,
+    y: 1 * TILE_SIZE,
+    speed: 2,
+    dirX: 0,
+    dirY: 0,
+    size: 24,
+  };
+}
+
+function updatePlayer() {
+  const nextX = player.x + player.dirX * player.speed;
+  const nextY = player.y + player.dirY * player.speed;
+
+  const nextCol = Math.floor((nextX + player.size / 2) / TILE_SIZE);
+  const nextRow = Math.floor((nextY + player.size / 2) / TILE_SIZE);
+
+  if (MAZE[nextRow][nextCol] !== "#") {
+    player.x = nextX;
+    player.y = nextY;
+    player.col = nextCol;
+    player.row = nextRow;
+  }
+}
+
+function drawPlayer() {
+  ctx.fillStyle = SETTINGS.playerColor;
+  ctx.beginPath();
+  ctx.arc(
+    player.x + player.size / 2,
+    player.y + player.size / 2,
+    player.size / 2,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft" || e.key === "a") {
+    player.dirX = -1; player.dirY = 0;
+  }
+  if (e.key === "ArrowRight" || e.key === "d") {
+    player.dirX = 1; player.dirY = 0;
+  }
+  if (e.key === "ArrowUp" || e.key === "w") {
+    player.dirY = -1; player.dirX = 0;
+  }
+  if (e.key === "ArrowDown" || e.key === "s") {
+    player.dirY = 1; player.dirX = 0;
+  }
+});
+####################
+#        ##        #
+#   ##   ##   ##   #
+#   ##        ##   #
+#   ######  ####   #
+#   #              #
+#   ######   #######
+#   #    #   #     #
+#   #    #####     #
+#   #              #
+####################
+const TILE_SIZE = 40;
+
+const MAZE = [
+  "####################",
+  "#........##........#",
+  "#.####...##...####.#",
+  "#.#  #.......#  #..#",
+  "#.#  #### ####  #..#",
+  "#........D........E#",
+  "####################",
+];
+function buildMazePlatforms() {
+  platforms = [];
+
+  for (let row = 0; row < MAZE.length; row++) {
+    for (let col = 0; col < MAZE[row].length; col++) {
+      const tile = MAZE[row][col];
+
+      if (tile === "#") {
+        platforms.push({
+          x: col * TILE_SIZE,
+          y: row * TILE_SIZE,
+          width: TILE_SIZE,
+          height: TILE_SIZE,
+          type: "wall"
+        });
+      }
+
+      if (tile === "D") {
+        gems.push({
+          x: col * TILE_SIZE + TILE_SIZE / 2,
+          y: row * TILE_SIZE + TILE_SIZE / 2,
+          radius: 10,
+          collected: false
+        });
+      }
+
+      if (tile === "E") {
+        exitZone = {
+          x: col * TILE_SIZE,
+          y: row * TILE_SIZE,
+          width: TILE_SIZE,
+          height: TILE_SIZE
+        };
+      }
+    }
+  }
+}
+
 }
 
 function allGemsCollected() {
